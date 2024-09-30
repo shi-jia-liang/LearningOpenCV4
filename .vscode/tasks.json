@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "OpenCV4.10.0 Compile tasks",
+            "type": "cppbuild",
+            "command": "D:/C_C++/msys64/mingw64/bin/g++.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "-std=c++11",
+                "${file}",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe",
+                "D:/C_C++/lib/OpenCV4/build/install/x64/mingw/bin/libopencv_world4100.dll",
+                "-I",
+                "D:/C_C++/lib/OpenCV4/build/install/include",
+                "-I",
+                "D:/C_C++/lib/OpenCV4/build/install/include/opencv2"
+            ],
+            "options": {
+                "cwd": "D:/C_C++/msys64/mingw64/bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+        }
+    ]
+}
