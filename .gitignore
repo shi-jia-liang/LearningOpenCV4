@@ -1,2 +1,4 @@
 *.exe
+
+# 忽略 .vscode 目录
 .vscode/
