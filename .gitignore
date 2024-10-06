@@ -1,4 +1,51 @@
-*.exe
+# Prerequisites
+*.d
 
-# 忽略 .vscode 目录
-# .vscode/
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Debug files
+cmake-build-*/
+
+# idea configuation files
+.idea/
+
+# Resouces files
+executable/svm/images
+executable/svm/videos
+executable/calibration/data
+
+# vcpkg
+.vcpkg*
+
+# macOS
+.DS_Store
+
+/build/*

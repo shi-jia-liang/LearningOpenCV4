@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project("install_test")
 
+set(OpenCV_DIR "D:/C_C++/lib/OpenCV4/build/install/x64/mingw/lib")
+
 # 查找 OpenCV
 find_package(OpenCV REQUIRED)
 
