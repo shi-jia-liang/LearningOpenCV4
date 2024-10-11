@@ -2,7 +2,8 @@
 #include <opencv2/opencv.hpp>
 
 int main()
-{
+{	
+	/* 图像存储容器 */
 	// 第一种创建Mat类
 	cv::Mat a1; // 创建一个名为a1的矩阵头
 	// 第二种创建Mat类
@@ -15,8 +16,8 @@ int main()
 	CV_16U	16位无符号整数(ushort)	0~65535
 	CV_16S	16位符号整数(short)		-32768~32767
 	CV_32S	32位符号整数(int)		-2147483648~2147483647
-	CV_32F	32位浮点整数(float)		-FLT_MAX~FLT_MAX
-	CV_64F	64位浮点整数(double)	-DBL_MAX~DBL_MAX
+	CV_32F	32位浮点整数(float)		-FLT_MAX~FLT_MAX(0~1)
+	CV_64F	64位浮点整数(double)	-DBL_MAX~DBL_MAX(0~1)
 	*/
 	cv::Mat a3(3, 3, CV_8UC1); // 创建一个3x3的8位无符号整数的单通道矩阵
 	cv::Mat a4(3, 3, CV_8U);   // 创建一个3x3的8位无符号整数的单通道矩阵，C1标识可省略
@@ -94,28 +95,39 @@ int main()
 	// (3)通过迭代器访问Mat类矩阵中的元素
 	// (4)通过矩阵元素的地址定位方式访问元素
 
-	// 图像的读取与显示
+	/* 图像的读取与显示 */
 	/*
+	输入图片
 	cv::imread( const String& filename,				需要读取的图像文件名称
 	 			int flags = IMREAD_COLOR 			读取图像形式的标志，常见的图像形式参数：	IMREAD_GRAYSCALE(单通道灰色图像后读取)、
 																							IMREAD_COLOR(3通道BGR彩色图像)
 				);
+
+	创建窗口
 	cv::namedWindow(const String& winname, 			窗口名称
 					int flags = WINDOW_AUTOSIZE		窗口属性设置标志，常见的窗口属性标志参数：	WINDOW_NORMAL(显示图像后，允许用户随意调整窗口大小)、
 																							WINDOW_AUTOSIZE(根据图像大小显示窗口，不允许用户随意调整大小)、
 																							WINDOW_KEEPRATIO(保持图像的比例)、
 																							WINDOW_FULLSCREEN(全屏显示窗口)
 					);
+
+	显示图片(最多显示4通道图片)
 	cv::imshow(	const String& winname,				窗口名称
 				InputArray mat						要显示的图像矩阵
 				);
+
+	视频容器
 	cv::VideoCapture(	const String& filename, 	需要读取的视频文件名称
 						int apiPreference = CAP_ANY	读取数据时设置的属性
 						);
+
+	输出图片
 	cv::imwrite(const String& filename,								保存图像的地址和文件名，包括图像格式
 				InputArray img,										将要保存的Mat类矩阵变量
               	const std::vector<int>& params = std::vector<int>()	保存图片格式属性设置标志
 				);
+				
+	输出视频
 	cv::VideoWriter(const String& filename, 		保存视频的地址和文件名，包含视频格式
 					int fourcc, 					压缩帧的4字符编解码器代码
 					double fps,						保存视频的帧率
