@@ -177,7 +177,7 @@ int main()
 				double thresh, 		二值化阈值
 				double maxval, 		二值化过程中的最大值
 				int type 			选择图像二值化方法的标志
-				);					返回值double,得到
+				);					返回值double,根据图像二值化方法得到相关坐标点的元素
 
 	局部自适应阈值的二值化方法
 	adaptiveThreshold( 	InputArray src, 	输入图像

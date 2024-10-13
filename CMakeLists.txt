@@ -1,17 +1,17 @@
-cmake_minimum_required(VERSION 3.5)
+# cmake_minimum_required(VERSION 3.5)
 
-project("install_test")
+# project("install_test")
 
-set(OpenCV_DIR "D:/C_C++/lib/OpenCV4/build/install/x64/mingw/lib")
+# set(OpenCV_DIR "D:/C_C++/lib/OpenCV4/build/install/x64/mingw/lib")
 
-# 查找 OpenCV
-find_package(OpenCV REQUIRED)
+# # 查找 OpenCV
+# find_package(OpenCV REQUIRED)
 
-# 创建可执行文件
-add_executable(${PROJECT_NAME} Src/install_test.cpp)
+# # 创建可执行文件
+# add_executable(${PROJECT_NAME} Src/install_test.cpp)
 
-# 包含 OpenCV 头文件
-include_directories(${OpenCV_INCLUDE_DIRS})
+# # 包含 OpenCV 头文件
+# include_directories(${OpenCV_INCLUDE_DIRS})
 
-# 链接 OpenCV 库
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+# # 链接 OpenCV 库
+# target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
