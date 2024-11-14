@@ -273,7 +273,32 @@ int main()
 							const Point2f dst[], 			输出图像的像素坐标轴
 							int solveMethod = DECOMP_LU		选择计算透视变换矩阵方法的标志
 							);								返回值Mat,一个3x3矩阵
-
+	*/
+	cv::Mat PerspectiveImg = cv::imread("../Img/noobcvqr.png");
+	if (PerspectiveImg.empty())
+	{
+		std::cout << "图像不存在" << std::endl;
+		return -1;
+	}
+	cv::Point2f src_points[4];
+	cv::Point2f dst_points[4];
+	//通过Image Watch查看的二维码四个角点坐标
+	src_points[0] = cv::Point2f(94.0, 374.0);
+	src_points[1] = cv::Point2f(507.0, 380.0);
+	src_points[2] = cv::Point2f(1.0, 623.0);
+	src_points[3] = cv::Point2f(627.0, 627.0);
+	//期望透视变换后二维码四个角点的坐标
+	dst_points[0] = cv::Point2f(0.0, 0.0);
+	dst_points[1] = cv::Point2f(627.0, 0.0);
+	dst_points[2] = cv::Point2f(0.0, 627.0);
+	dst_points[3] = cv::Point2f(627.0, 627.0);
+	cv::Mat rotation, warpPerspectiveImg; 
+	rotation = cv::getPerspectiveTransform(src_points, dst_points);  //计算透视变换矩阵
+	cv::warpPerspective(PerspectiveImg, warpPerspectiveImg, rotation, PerspectiveImg.size());  //透视变换投影
+	cv::imshow("img", PerspectiveImg);
+	cv::imshow("img_warp", warpPerspectiveImg);
+	cv::waitKey(0);
+	/*
 	极坐标变换
 	warpPolar(	InputArray src, 	输入图像
 				OutputArray dst, 	输出图像
