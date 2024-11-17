@@ -3,20 +3,20 @@
 
 int main()
 {
-	// 读取图片，图片格式为RBG颜色模型
+	// 读取图像，图像格式为RBG颜色模型
 	cv::Mat RGB = cv::imread("../Img/Lena.jpg", cv::IMREAD_COLOR);
-	// 判断图片是否存在
+	// 判断图像是否存在
 	if (RGB.empty())
 	{
-		std::cout << "图片不存在！" << std::endl;
+		std::cout << "图像不存在！" << std::endl;
 		return -1;
 	}
 
 	/* 图像颜色空间 */
-	// 转换图片颜色格式
+	// 转换图像颜色格式
 	cv::Mat gray, HSV, YUV, Lab, RGB32;
 	/*
-	图片变换
+	图像变换
 	Mat.convertTo(	OutputArray dst,	转换类型后输出的图像
 					int rtype, 			转换图像的数据类型
 					double alpha, 		转换过程中的缩放因子
@@ -27,19 +27,19 @@ int main()
 	// img32.convertTo(RGB, CV_8U, 255);			// 将CV_32F类型转换为CV_8U类型(将数值范围由[0,1]映射到[0,255])
 
 	/*
-	转换图片颜色格式
-	cvtColor( 	InputArray src, 	待转换颜色模型的原始图像
-				OutputArray dst, 	转换颜色模型后的目标图像
-				int code, 			颜色空间转换的标志
-				int dstCn = 0 		目标图像中的通道数
-				);
+	转换图像颜色格式
+	cv::cvtColor( 	InputArray src, 	待转换颜色模型的原始图像
+					OutputArray dst, 	转换颜色模型后的目标图像
+					int code, 			颜色空间转换的标志
+					int dstCn = 0 		目标图像中的通道数
+					);
 	*/
 	cv::cvtColor(RGB32, gray, cv::COLOR_BGR2GRAY);
 	cv::cvtColor(RGB32, HSV, cv::COLOR_BGR2HSV);
 	cv::cvtColor(RGB32, YUV, cv::COLOR_BGR2YUV);
 	cv::cvtColor(RGB32, Lab, cv::COLOR_BGR2Lab);
 
-	// 展示图片
+	// 展示图像
 	cv::imshow("原图", RGB32);
 	cv::imshow("灰色图", gray);
 	cv::imshow("HSV图", HSV);
@@ -53,12 +53,12 @@ int main()
 	std::vector<cv::Mat> imgv;
 	/*
 	多通道分离
-	split(	const Mat& src, 		带分离的多通道图像
-			Mat* mvbegin			分离后的单通道图像，为数组格式
-			);
-	split(	InputArray m, 			带分离的多通道图像
-			OutputArrayOfArrays mv	分离后的单通道图像，为向量(vector)形式
-			);
+	cv::split(	const Mat& src, 		带分离的多通道图像
+				Mat* mvbegin			分离后的单通道图像，为数组格式
+				);
+	cv::split(	InputArray m, 			带分离的多通道图像
+				OutputArrayOfArrays mv	分离后的单通道图像，为向量(vector)形式
+				);
 	*/
 	cv::split(RGB, imgs);
 	cv::split(HSV, imgv);
@@ -66,13 +66,13 @@ int main()
 	cv::Mat com_imgs, com_imgv;
 	/*
 	多通道合并
-	merge(	const Mat* mv, 			需要合并的图像数组
-			size_t count, 			输入的图像数组的长度，其数值必须大于0
-			OutputArray dst			合并后的图像
-			);
-	merge(	InputArrayOfArrays mv, 	需要合并的图像向量
-			OutputArray dst			合并后的图像
-			);
+	cv::merge(	const Mat* mv, 			需要合并的图像数组
+				size_t count, 			输入的图像数组的长度，其数值必须大于0
+				OutputArray dst			合并后的图像
+				);
+	cv::merge(	InputArrayOfArrays mv, 	需要合并的图像向量
+				OutputArray dst			合并后的图像
+				);
 	*/
 	cv::merge(imgs, 3, com_imgs);
 	cv::merge(imgv, com_imgv);
@@ -98,13 +98,13 @@ int main()
 	cv::Point minIdx, maxIdx;
 	/*
 	计算矩阵中的最大值与最小值
-	minMaxLoc(	InputArray src, 				目标矩阵，必须是单通道矩阵
-				CV_OUT double* minVal,			矩阵中的最小值
-				CV_OUT double* maxVal = 0, 		矩阵中的最大值
-				CV_OUT Point* minLoc = 0,		矩阵中的最小值在矩阵中的坐标
-				CV_OUT Point* maxLoc = 0, 		矩阵中的最大值在矩阵中的坐标
-				InputArray mask = noArray()		掩膜(设置矩阵中的指定区域)
-				);
+	cv::minMaxLoc(	InputArray src, 				目标矩阵，必须是单通道矩阵
+					CV_OUT double* minVal,			矩阵中的最小值
+					CV_OUT double* maxVal = 0, 		矩阵中的最大值
+					CV_OUT Point* minLoc = 0,		矩阵中的最小值在矩阵中的坐标
+					CV_OUT Point* maxLoc = 0, 		矩阵中的最大值在矩阵中的坐标
+					InputArray mask = noArray()		掩膜(设置矩阵中的指定区域)
+					);
 
 	拓展矩阵(将多通道矩阵变为单通道矩阵)
 	Mat.reshape(int cn, 						转换后矩阵的通道数
@@ -117,162 +117,162 @@ int main()
 	// 标准差表示图像中明暗变化的对比程度，标准差越大，表示图像中敏感变化越明显
 	/*
 	计算矩阵的平均值
-	mean(	InputArray src, 				目标矩阵
-			InputArray mask = noArray()		掩膜
-			);								返回值cv::Scalar，得到平均值
+	cv::mean(	InputArray src, 				目标矩阵
+				InputArray mask = noArray()		掩膜
+				);								返回值cv::Scalar，得到平均值
 
 	计算矩阵的标准差
-	meanStdDev(	InputArray src, 			目标矩阵
-				OutputArray mean, 			图片每个通道的平均值
-				OutputArray stddev,			图片每个通道的标准差
-				InputArray mask=noArray()	掩膜
-				);
+	cv::meanStdDev(	InputArray src, 			目标矩阵
+					OutputArray mean, 			图像每个通道的平均值
+					OutputArray stddev,			图像每个通道的标准差
+					InputArray mask=noArray()	掩膜
+					);
 
 	最大矩阵
-	max(const Mat& src1, 		第一个图像矩阵
-		const Mat& src2, 		第二个图像矩阵
-		Mat& dst				保留对应位置较大灰度值的图像矩阵
-		);
+	cv::max(const Mat& src1, 		第一个图像矩阵
+			const Mat& src2, 		第二个图像矩阵
+			Mat& dst				保留对应位置较大灰度值的图像矩阵
+			);
 
 	最小矩阵
-	min(const Mat& src1, 		第一个图像矩阵
-		const Mat& src2, 		第二个图像矩阵
-		Mat& dst				保留对应位置较小灰度值的图像矩阵
-		);
+	cv::min(const Mat& src1, 		第一个图像矩阵
+			const Mat& src2, 		第二个图像矩阵
+			Mat& dst				保留对应位置较小灰度值的图像矩阵
+			);
 
 	逻辑运算"与"
-	bitwise_and(InputArray src1, 				第一个图像矩阵
-				InputArray src2,				第二个图像矩阵
-				OutputArray dst, 				逻辑运算输出结果
-				InputArray mask = noArray()		掩膜
-				);
+	cv::bitwise_and(InputArray src1, 				第一个图像矩阵
+					InputArray src2,				第二个图像矩阵
+					OutputArray dst, 				逻辑运算输出结果
+					InputArray mask = noArray()		掩膜
+					);
 
 	逻辑运算"或"
-	bitwise_or(	InputArray src1, 				第一个图像矩阵
-				InputArray src2,				第二个图像矩阵
-				OutputArray dst,				逻辑运算输出结果
-				InputArray mask = noArray()		掩膜
-				);
+	cv::bitwise_or(	InputArray src1, 				第一个图像矩阵
+					InputArray src2,				第二个图像矩阵
+					OutputArray dst,				逻辑运算输出结果
+					InputArray mask = noArray()		掩膜
+					);
 
 	逻辑运算"异或"
-	bitwise_xor(InputArray src1, 				第一个图像矩阵
-				InputArray src2,				第二个图像矩阵
-				OutputArray dst,				逻辑运算输出结果
-				InputArray mask = noArray()		掩膜
-				);
+	cv::bitwise_xor(InputArray src1, 				第一个图像矩阵
+					InputArray src2,				第二个图像矩阵
+					OutputArray dst,				逻辑运算输出结果
+					InputArray mask = noArray()		掩膜
+					);
 
 	逻辑运算"非"
-	bitwise_not(InputArray src, 				第一个图像矩阵
-				OutputArray dst,				逻辑运算输出结果
-				InputArray mask = noArray()		掩膜
-				);
+	cv::bitwise_not(InputArray src, 				第一个图像矩阵
+					OutputArray dst,				逻辑运算输出结果
+					InputArray mask = noArray()		掩膜
+					);
 
 	*/
 
 	// 图像二值化(使用"阈值"和"查找表")
 	/*
 	二值化方法
-	threshold( 	InputArray src, 	输入图像
-				OutputArray dst,	二值化后的图像
-				double thresh, 		二值化阈值
-				double maxval, 		二值化过程中的最大值
-				int type 			选择图像二值化方法的标志
-				);					返回值double,根据图像二值化方法得到相关坐标点的元素
+	cv::threshold( 	InputArray src, 	输入图像
+					OutputArray dst,	二值化后的图像
+					double thresh, 		二值化阈值
+					double maxval, 		二值化过程中的最大值
+					int type 			选择图像二值化方法的标志
+					);					返回值double,根据图像二值化方法得到相关坐标点的元素
 
 	局部自适应阈值的二值化方法
-	adaptiveThreshold( 	InputArray src, 	输入图像
-						OutputArray dst,	二值化后的图像
-						double maxValue, 	二值化的最大值
-						int adaptiveMethod,	自适应确定阈值的方法
-						int thresholdType, 	选择图像二值化方法的标志
-						int blockSize, 		自适应确定阈值的像素领域大小
-						double C 			从平均值或者加权平均值中减去的常数，可正可负
-						);
+	cv::adaptiveThreshold( 	InputArray src, 	输入图像
+							OutputArray dst,	二值化后的图像
+							double maxValue, 	二值化的最大值
+							int adaptiveMethod,	自适应确定阈值的方法
+							int thresholdType, 	选择图像二值化方法的标志
+							int blockSize, 		自适应确定阈值的像素领域大小
+							double C 			从平均值或者加权平均值中减去的常数，可正可负
+							);
 
 	查找表
-	LUT(InputArray src, 输入图像
-		InputArray lut, 灰度值查找表
-		OutputArray dst	输出图像
-		);
+	cv::LUT(InputArray src, 输入图像
+			InputArray lut, 灰度值查找表
+			OutputArray dst	输出图像
+			);
 	*/
 
 	/* 图像变换 */
 	// 图像连接
 	/*
 	上下连接1
-	vconcat(const Mat* src, 	输入图像(确定拼接图像的宽度)
-			size_t nsrc, 		对输入图像进行n次上下拼接
-			OutputArray dst		输出图像
-			);
+	cv::vconcat(const Mat* src, 	输入图像(确定拼接图像的宽度)
+				size_t nsrc, 		对输入图像进行n次上下拼接
+				OutputArray dst		输出图像
+				);
 
 	上下连接2
-	vconcat(InputArray src1,	输入图像1(确定拼接图像的宽度)
-			InputArray src2,	输入图像2
-			OutputArray dst		输出图像
-			);
+	cv::vconcat(InputArray src1,	输入图像1(确定拼接图像的宽度)
+				InputArray src2,	输入图像2
+				OutputArray dst		输出图像
+				);
 
 	左右连接1
-	hconcat(const Mat* src, 	输入图像(确定拼接图像的高度)
-			size_t nsrc, 		对输入图像进行n次左右拼接
-			OutputArray dst		输出图像
-			);
+	cv::hconcat(const Mat* src, 	输入图像(确定拼接图像的高度)
+				size_t nsrc, 		对输入图像进行n次左右拼接
+				OutputArray dst		输出图像
+				);
 
 	左右连接2
-	hconcat(InputArray src1, 	输入图像1(确定拼接图像的高度)
-			InputArray src2, 	输入图像2
-			OutputArray dst		输出图像
-			);
+	cv::hconcat(InputArray src1, 	输入图像1(确定拼接图像的高度)
+				InputArray src2, 	输入图像2
+				OutputArray dst		输出图像
+				);
 
 	图像尺寸变换(先"缩放"再"调整")
-	resize( InputArray src, 					输入图像
-			OutputArray dst,					输出图像(要与输入图像是相同的数据类型)
-			Size dsize, 						输出图像的尺寸
-			double fx = 0, 						水平轴的比例因子
-			double fy = 0,						垂直轴的比例因子
-			int interpolation = INTER_LINEAR 	插值方法的标志
-			);
+	cv::resize( InputArray src, 					输入图像
+				OutputArray dst,					输出图像(要与输入图像是相同的数据类型)
+				Size dsize, 						输出图像的尺寸
+				double fx = 0, 						水平轴的比例因子
+				double fy = 0,						垂直轴的比例因子
+				int interpolation = INTER_LINEAR 	插值方法的标志
+				);
 
 
 	翻转变换
-	flip(	InputArray src, 	输入图像
-			OutputArray dst, 	输出图像
-			int flipCode		翻转方式得标志(数值大于0表示绕y轴翻转;数等于0表示绕x轴翻转;数值小于0表示绕xy轴翻转)
-			);
+	cv::flip(	InputArray src, 	输入图像
+				OutputArray dst, 	输出图像
+				int flipCode		翻转方式得标志(数值大于0表示绕y轴翻转;数等于0表示绕x轴翻转;数值小于0表示绕xy轴翻转)
+				);
 
 	计算旋转矩阵
-	getRotationMatrix2D(Point2f center, 矩阵的旋转中心位置
-						double angle, 	矩阵的旋转角度
-						double scale	两个轴的比例因子
-						);				返回值Mat,一个2x3矩阵
+	cv::getRotationMatrix2D(Point2f center, 矩阵的旋转中心位置
+							double angle, 	矩阵的旋转角度
+							double scale	两个轴的比例因子
+							);				返回值Mat,一个2x3矩阵
 
 	仿射变换(综合了平移、旋转、缩放的功能)
-	warpAffine( InputArray src, 						输入图像
-				OutputArray dst,						输出图像
-				InputArray M, 							仿射变换矩阵(综合了平移、旋转、缩放)
-				Size dsize,								输出图像的尺寸
-				int flags = INTER_LINEAR,				插值方法的标志
-				int borderMode = BORDER_CONSTANT,		像素边界外推方法的标志
-				const Scalar& borderValue = Scalar());	填充边界使用的数值，默认情况下为0
-
-	反求仿射变换矩阵
-	getAffineTransform( const Point2f src[], 	输入图像的像素坐标轴
-						const Point2f dst[] 	输出图像的像素坐标轴
-						);						返回值Mat,一个2x3矩阵
-
-	透视变换
-	warpPerspective(InputArray src, 						输入图像
+	cv::warpAffine( InputArray src, 						输入图像
 					OutputArray dst,						输出图像
-					InputArray M, 							透视变换矩阵
+					InputArray M, 							仿射变换矩阵(综合了平移、旋转、缩放)
 					Size dsize,								输出图像的尺寸
 					int flags = INTER_LINEAR,				插值方法的标志
 					int borderMode = BORDER_CONSTANT,		像素边界外推方法的标志
 					const Scalar& borderValue = Scalar());	填充边界使用的数值，默认情况下为0
 
+	反求仿射变换矩阵
+	cv::getAffineTransform( const Point2f src[], 	输入图像的像素坐标轴
+							const Point2f dst[] 	输出图像的像素坐标轴
+							);						返回值Mat,一个2x3矩阵
+
+	透视变换
+	cv::warpPerspective(InputArray src, 						输入图像
+						OutputArray dst,						输出图像
+						InputArray M, 							透视变换矩阵
+						Size dsize,								输出图像的尺寸
+						int flags = INTER_LINEAR,				插值方法的标志
+						int borderMode = BORDER_CONSTANT,		像素边界外推方法的标志
+						const Scalar& borderValue = Scalar());	填充边界使用的数值，默认情况下为0
+
 	反求透视变换矩阵
-	getPerspectiveTransform(const Point2f src[], 			输入图像的像素坐标轴
-							const Point2f dst[], 			输出图像的像素坐标轴
-							int solveMethod = DECOMP_LU		选择计算透视变换矩阵方法的标志
-							);								返回值Mat,一个3x3矩阵
+	cv::getPerspectiveTransform(const Point2f src[], 			输入图像的像素坐标轴
+								const Point2f dst[], 			输出图像的像素坐标轴
+								int solveMethod = DECOMP_LU		选择计算透视变换矩阵方法的标志
+								);								返回值Mat,一个3x3矩阵
 	*/
 	cv::Mat PerspectiveImg = cv::imread("../Img/noobcvqr.png");
 	if (PerspectiveImg.empty())
@@ -300,13 +300,13 @@ int main()
 	cv::waitKey(0);
 	/*
 	极坐标变换
-	warpPolar(	InputArray src, 	输入图像
-				OutputArray dst, 	输出图像
-				Size dsize,			输出图像的尺寸
-				Point2f center, 	极坐标变换时极坐标的原点坐标
-				double maxRadius, 	变换时边界圆的半径
-				int flags			插值方法与极坐标映射方法的标志
-				);
+	cv::warpPolar(	InputArray src, 	输入图像
+					OutputArray dst, 	输出图像
+					Size dsize,			输出图像的尺寸
+					Point2f center, 	极坐标变换时极坐标的原点坐标
+					double maxRadius, 	变换时边界圆的半径
+					int flags			插值方法与极坐标映射方法的标志
+					);
 	*/
 
 	/* 在图像上绘制几何图形 */
@@ -436,18 +436,18 @@ int main()
 	/* 图像金字塔 */
 	/*
 	下采样
-	pyrDown(InputArray src, 					输入图像
-			OutputArray dst,					输出图像
-			const Size& dstsize = Size(), 		输出图像的尺寸
-			int borderType = BORDER_DEFAULT 	像素边界外推方法的标志
-			);
+	cv::pyrDown(InputArray src, 					输入图像
+				OutputArray dst,					输出图像
+				const Size& dstsize = Size(), 		输出图像的尺寸
+				int borderType = BORDER_DEFAULT 	像素边界外推方法的标志
+				);
 
 	上采样
-	pyrUp( 	InputArray src, 					输入图像
-			OutputArray dst,					输出图像
-			const Size& dstsize = Size(), 		输出图像的尺寸
-			int borderType = BORDER_DEFAULT 	像素边界外推方法的标志
-			);
+	cv::pyrUp( 	InputArray src, 					输入图像
+				OutputArray dst,					输出图像
+				const Size& dstsize = Size(), 		输出图像的尺寸
+				int borderType = BORDER_DEFAULT 	像素边界外推方法的标志
+				);
 
 	*/
 	std::vector<cv::Mat> Gauss, Lap; // 高斯"金字塔" 和 拉普拉斯"金字塔"

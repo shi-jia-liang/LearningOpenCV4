@@ -97,7 +97,7 @@ int main()
 
 	/* 图像的读取与显示 */
 	/*
-	输入图片
+	输入图像
 	cv::imread( const String& filename,				需要读取的图像文件名称
 	 			int flags = IMREAD_COLOR 			读取图像形式的标志，常见的图像形式参数：	IMREAD_GRAYSCALE(单通道灰色图像后读取)、
 																							IMREAD_COLOR(3通道BGR彩色图像)
@@ -111,7 +111,7 @@ int main()
 																							WINDOW_FULLSCREEN(全屏显示窗口)
 					);
 
-	显示图片(最多显示4通道图片)
+	显示图像(最多显示4通道图像)
 	cv::imshow(	const String& winname,				窗口名称
 				InputArray mat						要显示的图像矩阵
 				);
@@ -121,10 +121,10 @@ int main()
 						int apiPreference = CAP_ANY	读取数据时设置的属性
 						);
 
-	输出图片
+	输出图像
 	cv::imwrite(const String& filename,								保存图像的地址和文件名，包括图像格式
 				InputArray img,										将要保存的Mat类矩阵变量
-              	const std::vector<int>& params = std::vector<int>()	保存图片格式属性设置标志
+              	const std::vector<int>& params = std::vector<int>()	保存图像格式属性设置标志
 				);
 				
 	输出视频

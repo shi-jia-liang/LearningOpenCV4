@@ -6,7 +6,7 @@ int main()
 	cv::Mat img = cv::imread("../Img/Lena.jpg");
 	if (img.empty())
 	{
-		std::cout << "图片不存在！" << std::endl;
+		std::cout << "图像不存在！" << std::endl;
 		return -1;
 	}
 
@@ -15,17 +15,17 @@ int main()
 	cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
 	/*
 	图像直方图的统计函数
-	calcHist( 	const Mat* images,			输入图像
-				int nimages,				输入图像的数量
-				const int* channels,		需要统计的通道索引数组
-				InputArray mask,			掩膜
-				OutputArray hist_gray,			输出的统计直方图数据
-				int dims,					需要计算直方图的维数
-				const int* histSize,		存放每个维度直方图的数组的尺寸
-				const float** ranges,		每个图象通道中灰度值的取值范围
-				bool uniform = true,		直方图是否均匀的标志
-				bool accumulate = false		是否累计统计直方图的标志(该参数主要用于统计多个图像整体的直方图)
-				);
+	cv::calcHist( 	const Mat* images,			输入图像
+					int nimages,				输入图像的数量
+					const int* channels,		需要统计的通道索引数组
+					InputArray mask,			掩膜
+					OutputArray hist_gray,			输出的统计直方图数据
+					int dims,					需要计算直方图的维数
+					const int* histSize,		存放每个维度直方图的数组的尺寸
+					const float** ranges,		每个图象通道中灰度值的取值范围
+					bool uniform = true,		直方图是否均匀的标志
+					bool accumulate = false		是否累计统计直方图的标志(该参数主要用于统计多个图像整体的直方图)
+					);
 	*/
 	cv::Mat hist_gray;			 // 用于存放直方图的计算结果
 	const int channels[1] = {0}; // 通道索引
@@ -51,14 +51,14 @@ int main()
 	/* 直方图操作 */
 	/*
 	直方图归一化
-	normalize( 	InputArray src, 				输入矩阵
-				InputOutputArray dst, 			输入与src相同的矩阵，同时作为输出，输出结果是CV_32F类型的矩阵
-				double alpha = 1, 				在范围归一化的情况下，归一化到下限边界的标准值
-				double beta = 0,				范围归一化时的上限范围
-				int norm_type = NORM_L2, 		归一化过程中数据范数种类的标志
-				int dtype = -1, 				输出数据类型选择的标志
-				InputArray mask = noArray()		掩膜
-				);
+	cv::normalize( 	InputArray src, 				输入矩阵
+					InputOutputArray dst, 			输入与src相同的矩阵，同时作为输出，输出结果是CV_32F类型的矩阵
+					double alpha = 1, 				在范围归一化的情况下，归一化到下限边界的标准值
+					double beta = 0,				范围归一化时的上限范围
+					int norm_type = NORM_L2, 		归一化过程中数据范数种类的标志
+					int dtype = -1, 				输出数据类型选择的标志
+					InputArray mask = noArray()		掩膜
+					);
 	*/
 	std::vector<double> positiveData = {2.0, 8.0, 10.0};
 	std::vector<double> normalize_L1, normalize_L2, normalize_Inf, normalize_L2SQR;
@@ -86,13 +86,13 @@ int main()
 	cv::waitKey(0);
 	cv::destroyAllWindows();
 
-	// 直方图比较
+	/* 直方图比较 */
 	/*
 	直方图比较
-	compareHist(InputArray H1, 	比较图像的直方图1
-				InputArray H2, 	比较图像的直方图2
-				int method 		比较方法的标志
-				);				返回值double,得到图像的相似性
+	cv::compareHist(InputArray H1, 	比较图像的直方图1
+					InputArray H2, 	比较图像的直方图2
+					int method 		比较方法的标志
+					);				返回值double,得到图像的相似性
 	*/
 	cv::Mat img_resize, img_pyrdown;
 	cv::Mat hist_resize, hist_pyrdown;
@@ -117,9 +117,9 @@ int main()
 	// 直方图均衡化
 	/*
 	图像均衡化
-	equalizeHist(	InputArray src, 输入图像(数据类型为CV_8UC1)
-					OutputArray dst 均衡化后的图像
-					);
+	cv::equalizeHist(	InputArray src, 输入图像(数据类型为CV_8UC1)
+						OutputArray dst 均衡化后的图像
+						);
 	*/
 	cv::Mat gray_equal;
 	cv::equalizeHist(gray, gray_equal); // 图像均衡化
@@ -145,12 +145,12 @@ int main()
 	// 由于直方图反向投影,并不能很好地找到相似纹理。因此,可以直接通过比较图像像素的形式来搜索是否存在相同的内容
 	// 模板匹配常用于在一幅图像中寻找特定内容的任务
 	/*
-	matchTemplate( 	InputArray image, 			待模板匹配的原始图像
-					InputArray templ,			模板图像
-					OutputArray result, 		模板匹配结果输出图像
-					int method, 				模板匹配方法的标志
-					InputArray mask = noArray() 掩膜
-					);
+	cv::matchTemplate( 	InputArray image, 			待模板匹配的原始图像
+						InputArray templ,			模板图像
+						OutputArray result, 		模板匹配结果输出图像
+						int method, 				模板匹配方法的标志
+						InputArray mask = noArray() 掩膜
+						);
 	*/
 	cv::imshow("Img", img);											  // 原图
 	cv::Mat img_temp = img(cv::Range(200, 400), cv::Range(200, 400)); // 抓取图像的一部分
