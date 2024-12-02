@@ -495,7 +495,7 @@ int main()
 						);
 	
 	Laplacian算子（无方向性，只需要一次边缘检测，是一个二阶导数算子，但对噪声比较敏感）
-	cv::Laplacian( 	InputArray src, 				输入图像
+	cv::Laplacian( 	InputArray src, 				输入图像，灰度图或者彩色图像
 					OutputArray dst, 				输出图像
 					int ddepth,						输出图像的数据类型
                     int ksize = 1, 					滤波器的大小
@@ -505,8 +505,8 @@ int main()
 					);
 
 	Canny算法（不容易受到噪声的影响，能识别图像中的弱边缘和强边缘，并结合强弱边缘的位置关系，综合给出图像整体的边缘信息）
-	cv::Canny( 	InputArray image, 			输入图像
-				OutputArray edges,			输出图像
+	cv::Canny( 	InputArray image, 			输入图像,数据类型只能是CV_8UC1
+				OutputArray edges,			输出图像,相同尺寸的单通道图像
                 double threshold1, 			第一个滞后阈值
 				double threshold2,			第二个滞后阈值
                 int apertureSize = 3, 		Sobel算子的直径
@@ -609,7 +609,7 @@ int main()
 
 	// Laplacian算子
 	cv::Mat Laplacianresult, Laplacianresult_g, Laplacianresult_G;
-	// 未滤波提取Laplacian边缘
+	// 未滤波提取Laplacian边缘 
 	cv::Laplacian(Lena, Laplacianresult, CV_16S, 3, 1, 0);
 	cv::convertScaleAbs(Laplacianresult, Laplacianresult);
 	// 滤波后提取Laplacian边缘
@@ -623,19 +623,18 @@ int main()
 	cv::destroyAllWindows();
 
 	// Canny算子
-	cv::Mat resultHigh, resultLow, resultG;
+	cv::Mat CannyresultHigh, CannyresultLow, CannyresultG;
 	// 高阈值检测图像边缘
-	cv::Canny(Lena_gray, resultHigh, 100, 200, 3);
+	cv::Canny(Lena_gray, CannyresultHigh, 100, 200, 3);
 	// 低阈值检测图像边缘
-	cv::Canny(Lena_gray, resultLow, 20, 40, 3);
+	cv::Canny(Lena_gray, CannyresultLow, 20, 40, 3);
 	// 高斯模糊后提取图像边缘
-	cv::GaussianBlur(Lena_gray, resultG, cv::Size(3, 3), 5);
-	cv::Canny(resultG, resultG, 100, 200, 3);
+	cv::GaussianBlur(Lena_gray, CannyresultG, cv::Size(3, 3), 5);
+	cv::Canny(CannyresultG, CannyresultG, 100, 200, 3);
 	// 显示结果
-	cv::imshow("Lena", Lena);
-	cv::imshow("resultHigh", resultHigh);
-	cv::imshow("resultLow", resultLow);
-	cv::imshow("resultG", resultG);
+	cv::imshow("resultHigh", CannyresultHigh);
+	cv::imshow("resultLow", CannyresultLow);
+	cv::imshow("resultG", CannyresultG);
 	cv::waitKey(0);
 	cv::destroyAllWindows();
 
