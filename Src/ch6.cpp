@@ -1,5 +1,38 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include <opencv2/ximgproc.hpp> //细化函数thinning()所在的头文件
+
+//绘制包含区域函数
+void drawState(cv::Mat &img, int number, cv::Mat centroids, cv::Mat stats, cv::String str) {
+	cv::RNG rng(10086);
+	std::vector<cv::Vec3b> colors;
+	for (int i = 0; i < number; i++)
+	{
+		//使用均匀分布的随机数确定颜色
+		cv::Vec3b vec3 = cv::Vec3b(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
+		colors.push_back(vec3);
+	}
+
+	for (int i = 1; i < number; i++)
+	{
+		// 中心位置
+		int center_x = centroids.at<double>(i, 0);
+		int center_y = centroids.at<double>(i, 1);
+		//矩形边框
+		int x = stats.at<int>(i, cv::CC_STAT_LEFT);
+		int y = stats.at<int>(i, cv::CC_STAT_TOP);
+		int w = stats.at<int>(i, cv::CC_STAT_WIDTH);
+		int h = stats.at<int>(i, cv::CC_STAT_HEIGHT);
+
+		// 中心位置绘制
+		cv::circle(img, cv::Point(center_x, center_y), 2, cv::Scalar(0, 255, 0), 2, 8, 0);
+		// 外接矩形
+		cv::Rect rect(x, y, w, h);
+		cv::rectangle(img, rect, colors[i], 1, 8, 0);
+		cv::putText(img, cv::format("%d", i), cv::Point(center_x, center_y), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 255), 1);
+	}
+	cv::imshow(str, img);
+}
 
 int main()
 {
@@ -43,13 +76,14 @@ int main()
 		std::cout << "图片不存在" << std::endl;
 		return -1;
 	}
-	cv::Mat riceB;
-	//将图像转成二值图像，用于统计连通域
-	cvtColor(rice, riceB, cv::COLOR_BGR2GRAY);
+	cv::Mat ricegray;
 	cv::Mat riceBW, riceBW_INV;
-	// 将图像装换成二值图像，同时把黑白区域颜色互换
-	cv::threshold(riceB, riceBW, 40, 255, cv::THRESH_BINARY);
-	cv::threshold(riceB, riceBW_INV, 40, 255, cv::THRESH_BINARY_INV);
+	//将彩色图像转成灰度图像，用于统计连通域
+	cvtColor(rice, ricegray, cv::COLOR_BGR2GRAY);
+	// 将灰度图像装换成二值图像，同时把黑白区域颜色互换
+	cv::threshold(ricegray, riceBW, 40, 255, cv::THRESH_BINARY);
+	cv::threshold(ricegray, riceBW_INV, 40, 255, cv::THRESH_BINARY_INV);
+	
 	// 距离变换
 	cv::Mat dist, dist_INV;
 	cv::distanceTransform(riceBW, dist, cv::DIST_L1, 3);
@@ -58,6 +92,7 @@ int main()
     cv::Mat distNorm, dist_INVNorm;
     cv::normalize(dist, distNorm, 0, 255, cv::NORM_MINMAX, CV_8U);
     cv::normalize(dist_INV, dist_INVNorm, 0, 255, cv::NORM_MINMAX, CV_8U);
+	
 	// 显示结果
 	cv::imshow("rice", rice);
 	cv::imshow("riceBW", riceBW);
@@ -138,40 +173,99 @@ int main()
 										int ltype = CV_32S		输出图像的数据类型，目前支持CV_32S和CV_16U
 										);						返回值int类型，表示图像中连通域的数目
 	*/
+	cv::Mat rice1 = rice.clone();
 	// 统计连通域的信息
 	cv::Mat out, stats, centroids;
 	// 统计图像中连通域的个数
-	int number2 = connectedComponentsWithStats(riceBW, out, stats, centroids, 8, CV_16U);
+	number = connectedComponentsWithStats(riceBW, out, stats, centroids, 8, CV_16U);
 	// 以不同颜色标记出不同的连通域
 	cv::Mat result2 = cv::Mat::zeros(rice.size(), rice.type());
 	int w2 = result2.cols;
 	int h2 = result2.rows;
-	for (int i = 1; i < number2; i++)
-	{
-		// 中心位置
-		int center_x = centroids.at<double>(i, 0);
-		int center_y = centroids.at<double>(i, 1);
-		// 矩形边框
-		int x = stats.at<int>(i, cv::CC_STAT_LEFT);
-		int y = stats.at<int>(i, cv::CC_STAT_TOP);
-		int w = stats.at<int>(i, cv::CC_STAT_WIDTH);
-		int h = stats.at<int>(i, cv::CC_STAT_HEIGHT);
-		int area = stats.at<int>(i, cv::CC_STAT_AREA);
-		// 中心位置绘制
-		cv::circle(rice, cv::Point(center_x, center_y), 2, cv::Scalar(0, 255, 0), 2, 8, 0);
-		// 外接矩形
-		cv::Rect rect(x, y, w, h);
-		cv::rectangle(rice, rect, colors[i], 1, 8, 0);
-		cv::putText(rice, cv::format("%d", i), cv::Point(center_x, center_y),
-			cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 255), 1);
-		std::cout << "number: " << i << ",area: " << area << std::endl;
-	}
-	// 显示结果
-	cv::imshow("标记后的图像", rice);
+	drawState(rice1, number, centroids, stats, "标记后的图像");
 	cv::waitKey(0);
 	cv::destroyAllWindows();
 
 	/* 腐蚀和膨胀 */
+	/*
+	图像形态学结构元素
+	cv::getStructuringElement(	int shape, 						生成结构元素的种类
+								Size ksize, 					结构元素的尺寸
+								Point anchor = Point(-1,-1)		中心点的位置
+								);								返回值Mat数据类型
+	*/
+	cv::Mat src = (cv::Mat_<uchar>(6, 6) << 
+		0, 	 0,   0,   0, 255,   0,
+		0, 255, 255, 255, 255, 255,
+		0, 255, 255, 255, 255,   0,
+		0, 255, 255, 255, 255,   0,
+		0, 255, 255, 255, 255,   0,
+		0, 	 0,   0,   0,   0,   0);
+	cv::Mat struct1, struct2;
+	struct1 = cv::getStructuringElement(0, cv::Size(3, 3));  //矩形结构元素
+	struct2 = cv::getStructuringElement(1, cv::Size(3, 3));  //十字结构元素
+	/*
+	腐蚀(周围像素点为0，则中心像素点为0)
+	cv::erode( 	InputArray src, 											输入图像
+				OutputArray dst, 											输出图像
+				InputArray kernel,											用于腐蚀操作的结构元素
+                Point anchor = Point(-1,-1), 								中心点在结构元素中的位置
+				int iterations = 1,											腐蚀的次数
+                int borderType = BORDER_CONSTANT,							像素外推法选择标志
+                const Scalar& borderValue = morphologyDefaultBorderValue() 	使用边界不变外推法时的边界值
+				);
+	*/
+	// cv::Mat erodeSrc1, erodeSrc2;  //存放腐蚀后的图像
+	// cv::erode(src, erodeSrc1, struct1);
+	// cv::erode(src, erodeSrc2, struct2);
+	// cv::imshow("src", src);
+	// cv::imshow("erodeSrc1", erodeSrc1);
+	// cv::imshow("erodeSrc2", erodeSrc2);
+	
+	cv::Mat eroderice;
+	eroderice = rice.clone();  //克隆一个单独的图像，用于后期图像绘制
+
+	//统计图像中连通域的个数
+	number = cv::connectedComponentsWithStats(riceBW, out, stats, centroids, 8, CV_16U);
+	drawState(rice, number, centroids, stats, "未腐蚀时统计连通域");  //绘制图像
+
+	cv::erode(riceBW, riceBW, struct1);  //对图像进行腐蚀
+	number = cv::connectedComponentsWithStats(riceBW, out, stats, centroids, 8, CV_16U);
+	drawState(eroderice, number, centroids, stats, "腐蚀后统计连通域");  //绘制图像
+
+	cv::waitKey(0);
+	cv::destroyAllWindows();
+	/*
+	膨胀(周围像素点为1，则中心像素点为1)
+	cv::dilate( InputArray src, 											输入图像
+				OutputArray dst, 											输出图像
+				InputArray kernel,											用于腐蚀操作的结构元素
+                Point anchor = Point(-1,-1), 								中心点在结构元素中的位置
+				int iterations = 1,											腐蚀的次数
+                int borderType = BORDER_CONSTANT,							像素外推法选择标志
+                const Scalar& borderValue = morphologyDefaultBorderValue() 	使用边界不变外推法时的边界值
+				);
+	
+	*/
+
 	/* 形态学应用 */
+	/*
+	形态学操作
+	cv::morphologyEx( 	InputArray src, 											输入图像
+						OutputArray dst,											输出图像
+                        int op, 													形态学操作类型的标志, 0:腐蚀, 1:膨胀, 2:开运算, 3:闭运算, 4:形态学梯度, 5:顶帽运算, 6:黑帽运算, 7:击中击不中运算
+						InputArray kernel,											结构元素
+                        Point anchor = Point(-1,-1), 								中心点在结构元素中的位置
+						int iterations = 1,											处理的次数
+                        int borderType = BORDER_CONSTANT,							像素外推法选择标志
+                        const Scalar& borderValue = morphologyDefaultBorderValue() 	使用边界不变外推法时的边界值
+						);
+	
+	图像细化
+	cv::ximgproc::thinning( InputArray src, 						输入图像
+							OutputArray dst, 						输出图像
+							int thinningType = THINNING_ZHANGSUEN	细化算法选择标志
+							);
+	*/
 	return 0;
 }

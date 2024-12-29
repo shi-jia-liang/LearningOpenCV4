@@ -4,7 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "D:/C_C++/lib/OpenCV4/build/install/include/**"
+                "D:/C_C++/Library/OpenCV4/build/install/include/**"
             ],
             "defines": [
                 "_DEBUG",

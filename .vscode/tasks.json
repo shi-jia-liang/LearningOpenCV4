@@ -12,12 +12,12 @@
                 "${file}",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe",
-                "D:/C_C++/lib/OpenCV4/build/install/x64/mingw/bin/libopencv_world4100.dll",
+                "D:/C_C++/Library/OpenCV4/build/install/x64/mingw/bin/libopencv_world4100.dll",
                 "-I",
-                "D:/C_C++/lib/OpenCV4/build/install/include",
+                "D:/C_C++/Library/OpenCV4/build/install/include",
                 "-I",
-                "D:/C_C++/lib/OpenCV4/build/install/include/opencv2"
-                // "-fexec-charset=GBK"
+                "D:/C_C++/Library/OpenCV4/build/install/include/opencv2",
+                "-fexec-charset=GBK"
             ],
             "options": {
                 "cwd": "D:/C_C++/msys64/mingw64/bin"
