@@ -4,7 +4,7 @@
 
 //绘制包含区域函数
 void drawState(cv::Mat &img, int number, cv::Mat centroids, cv::Mat stats, cv::String str) {
-	cv::RNG rng(10086);
+	cv::RNG rng(10000);
 	std::vector<cv::Vec3b> colors;
 	for (int i = 0; i < number; i++)
 	{
@@ -121,7 +121,7 @@ int main()
 							);						返回值int类型，表示图像中连通域的数目
 	*/
 	//生成随机颜色，用于区分不同连通域
-	cv::RNG rng(10086);
+	cv::RNG rng(10000);
 	cv::Mat connectout;
 	int number = cv::connectedComponents(riceBW, connectout, 8, CV_16U);
 	std::vector<cv::Vec3b> colors;
