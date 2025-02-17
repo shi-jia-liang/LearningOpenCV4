@@ -105,20 +105,20 @@ int main(){
 				  	dst, 		// 输出图像
 				  	window, 	// 目标区域
 				  	criteria 	// 停止条件
-				  	);
+				  	);			// 返回值int数据类型,表示算法在找到收敛位置前所经历的迭代次数
 	
 	通过鼠标在图像中选择目标区域
 	cv::selectROI(	windowName, 	// 窗口名称
 					src, 			// 输入图像
 					showCrossair, 	// 是否显示十字
 					fromCenter 		// 是否从中心开始选择
-					);
+					);				// 返回值Rect数据类型,目标区域
 	
 	自适应均值迁移法的目标跟踪函数				
 	cv::CamShift(	src, 		// 输入图像
 				  	window, 	// 目标区域
 				  	criteria 	// 停止条件
-				  	);
+				  	);			// 返回值RotatedRect数据类型,旋转后的矩形
 	*/
 	//打开视频文件，并判断是否成功打开
 	cv::VideoCapture vtest("../Video/vtest.avi");
@@ -311,26 +311,26 @@ int main(){
 	*/
 	/*
 	Faeneback多项式扩展算法光流法的目标跟踪函数
-	cv::calcOpticalFlowFarneback(	prevImg, 	// 前一帧图像
-									nextImg, 	// 当前帧图像
-									flow, 		// 光流
-									0.5, 		// 图像金字塔尺度因子
-									3, 			// 图像金字塔层数
-									15, 		// 窗口大小
-									3, 			// 多项式扩展系数
-									5, 			// 迭代次数
-									1.1, 		// 高斯标准差
-									0 			// 光流法的操作
+	cv::calcOpticalFlowFarneback( 	InputArray prev, 		// 前一帧图像
+									InputArray next, 		// 当前帧图像
+									InputOutputArray flow,	// 输出的光流图像
+                                    double pyr_scale, 		// 图像金字塔两层之间尺寸的比例
+									int levels, 			// 构建图像金字塔的层数
+									int winsize,			// 均值窗口的尺寸
+                                    int iterations, 		// 算法在每个金字塔图像中迭代的次数
+									int poly_n, 			// 在每个像素中找到多项式展开的像素领域的大小
+									double poly_sigma,		// 高斯标准差
+                                    int flags 				// 计算方法标志
 									);
-	
-	
+
 	计算二维向量的模长与方向
-	cv::cartToPolar(	x, 	// x方向
-						y, 	// y方向
-						mag, 	// 模长
-						angle 	// 方向
-						);
-	
+	cv::cartToPolar(InputArray x, 				// x方向
+					InputArray y,				// y方向
+                    OutputArray magnitude, 		// 模长
+					OutputArray angle,			// 方向
+                    bool angleInDegrees = false	// 角度单位选择标志,false表示单位为弧度;true表示单位为角度
+					);
+
 	LK稀疏光流法的目标跟踪函数
 	cv::calcOpticalFlowPyrLK(	prevImg, 	// 前一帧图像
 								nextImg, 	// 当前帧图像
@@ -342,6 +342,19 @@ int main(){
 								5, 		// 金字塔层数
 								cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 20, 0.03), 	// 停止条件
 								cv::OPTFLOW_USE_INITIAL_FLOW 	// 使用初始光流
+								);
+
+	cv::calcOpticalFlowPyrLK( 	InputArray prevImg, 																		// 前一帧图像
+								InputArray nextImg,																			// 当前帧图像
+                                InputArray prevPts, 																		// 前一帧图像的特征点
+								InputOutputArray nextPts,																	// 当前帧图像的特征点
+                                OutputArray status, 																		// 特征点是否找到
+								OutputArray err,																			// 特征点的误差
+                                Size winSize = Size(21,21), 																// 搜索窗口大小
+								int maxLevel = 3,																			// 构建图像金字塔的层数
+                                TermCriteria criteria = TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, 30, 0.01),		// 迭代终止条件
+								int flags = 0, 																				// 寻找匹配光流点的操作标志
+								double minEigThreshold = 1e-4 																// 响应的最小特征值,当特征值小于该值时,不进行任何处理,是为光流点丢失
 								);
 	*/
 	cv::VideoCapture vtest2("../Video/vtest.avi");

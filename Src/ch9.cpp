@@ -53,38 +53,49 @@ int main() {
 	/* 角点检测 */
 	/*
 	绘制特征点函数
-	cv::drawKeypoints(	InputArray image, 				// 输入图像
-						const std::vector<KeyPoint>& keypoints, 	// 输入特征点
-						InputOutputArray outImage, 			// 输出图像
-						const Scalar& color = Scalar::all(-1), 	// 特征点的颜色
+	cv::drawKeypoints(	InputArray image, 									// 输入图像
+						const std::vector<KeyPoint>& keypoints, 			// 输入特征点
+						InputOutputArray outImage, 							// 输出图像
+						const Scalar& color = Scalar::all(-1), 				// 特征点的颜色
 						DrawMatchesFlags flags = DrawMatchesFlags::DEFAULT 	// 绘制特征点的标志
 						);
+	
+	cv::KeyPoint类
+	class KeyPoint{
+		float angle;  		// 关键点的角度
+		int class_id;  		// 关键点的类别ID
+		int octave;  		// 关键点所在的金字塔层数
+		Point2f pt;  		// 关键点的坐标
+		float response;  	// 关键点的响应值
+		float size;  		// 关键点的直径
+	};
 
 	角点Harris值函数
-	cv::cornerHarris(	InputArray src, 			// 输入图像
-						OutputArray dst, 			// 输出图像
-						int blockSize, 				// 角点检测中的邻域尺寸
-						int ksize, 					// Sobel算子的孔径尺寸
-						double k, 					// Harris角点检测参数
-						int borderType = BORDER_DEFAULT // 边界类型
+	cv::cornerHarris(	InputArray src, 				// 输入图像
+						OutputArray dst, 				// 输出图像
+						int blockSize, 					// 角点检测中的邻域尺寸
+						int ksize, 						// Sobel算子的半径尺寸,用于得到图像的梯度信息
+						double k, 						// Harris角点检测系数R的权重参数
+						int borderType = BORDER_DEFAULT // 像素外推法选择标志
 						);
-6
+
 	Shi-Tomasi角点检测函数
-	cv::goodFeaturesToTrack(	InputArray image, 			// 输入图像
-								OutputArray corners, 		// 输出角点
-								int maxCorners, 			// 角点的最大数目
-								double qualityLevel, 		// 角点的质量水平
-								double minDistance, 		// 角点之间的最小距离
-								InputArray mask = noArray(), // 掩码图像
-								int blockSize = 3, 			// 角点检测中的邻域尺寸
-								bool useHarrisDetector = false, // 是否使用Harris角点检测
-								double k = 0.04 				// Harris角点检测参数
-								);
+	cv::goodFeaturesToTrack(InputArray image, 				// 输入图像
+							OutputArray corners, 			// 输出角点
+							int maxCorners, 				// 角点的最大数目
+							double qualityLevel, 			// 角点的质量水平(角点阈值与最佳角点之间的关系)
+							double minDistance, 			// 角点之间的最小欧式距离
+							InputArray mask = noArray(), 	// 掩码图像
+							int blockSize = 3, 				// 角点检测中的邻域尺寸(梯度协方差矩阵的尺寸)
+							bool useHarrisDetector = false, // 是否使用Harris角点检测
+							double k = 0.04 				// Harris角点检测郭崇中的常值权重系数
+							);
+
 	计算亚像素级别角点位置函数
 	cv::cornerSubPix(	InputArray image, 			// 输入图像
 						InputOutputArray corners, 	// 输入输出角点
-						Size winSize, 				// 窗口尺寸
-						Size zeroZone, 				// 零区域尺寸
+						Size winSize, 				// 窗口尺寸()
+						Size zeroZone, 				// 零区域尺寸(搜索区域中间“死区”的尺寸)
 						TermCriteria criteria 		// 终止条件
 						);
 	*/
@@ -103,7 +114,7 @@ int main() {
 	// 计算Harris系数
 	cv::Mat harris;
 	int blockSize = 2;  // 邻域半径
-	int apertureSize = 3;  //
+	int apertureSize = 3;  // Sobel算子的半径尺寸
 	cornerHarris(lenagray1, harris, blockSize, apertureSize, 0.04);
 	
 	// 归一化便于进行数值比较和结果显示
@@ -188,7 +199,7 @@ int main() {
 	// 计算亚像素级别角点坐标
 	std::vector<cv::Point2f> cornersSub = corners3;  // 角点备份，方式别函数修改
 	cv::Size winSize = cv::Size(5, 5);
-	cv::Size zeroZone = cv::Size(-1, -1);
+	cv::Size zeroZone = cv::Size(-1, -1);	// 零区域尺寸,(-1,-1)表示没有死区
 	cv::TermCriteria criteria = cv::TermCriteria(
 		cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 40, 0.001);
 	cornerSubPix(lenagray3, cornersSub , winSize, zeroZone, criteria);
@@ -230,11 +241,12 @@ int main() {
 	// 创建SURF特征点类变量
 	// 需要安装opencv_contrib库,进行Cmake时勾选OPENCV_ENABLE_NONFREE
 	cv::Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create(
-								  400,   // 关键点阈值
-									4,   // 4组金字塔
-									3,   // 每组金字塔有3层
-								false,   // 使用128维描述子
-								false);  // 计算关键点方向
+		  400,  	// 关键点阈值
+			4,  	// 检测关键点的金字塔组数
+			3,  	// 检测关键点的金字塔层数
+		false,  	// 是否使用扩展的描述子的标志,默认为false对应的是64维描述子，true对应的是128维描述子
+		false		// 计算关键点方向,图像的局部梯度方向
+	);
 
 	// 计算SURF关键点
 	std::vector<cv::KeyPoint> Keypoints4;
@@ -260,15 +272,16 @@ int main() {
 	// 生产一个Lena图像的副本
 	cv::Mat lenacopy5 = lena.clone();
 	// 创建 ORB 特征点类变量
-	cv::Ptr<cv::ORB> orb = cv::ORB::create(	500, // 特征点数目
-											1.2f, // 金字塔层级之间的缩放比例
-											8, // 金字塔图像层数系数
-											31, // 边缘阈值
-											0, // 原图在金字塔中的层数
-											2, // 生成描述子时需要用的像素点数目
-											cv::ORB::HARRIS_SCORE, // 使用 Harris 方法评价特征点
-											31, // 生成描述子时关键点周围邻域的尺寸
-											20 // 计算 FAST 角点时像素值差值的阈值
+	cv::Ptr<cv::ORB> orb = cv::ORB::create(	
+		500, 					// 特征点数目
+		1.2f, 					// 金字塔层级之间的缩放比例
+		8, 						// 金字塔图像层数
+		31, 					// 边缘阈值
+		0, 						// 原图在金字塔中的层数
+		2, 						// 生成描述子时需要用的像素点数目,默认为2,表示使用BRIEF描述子
+		cv::ORB::HARRIS_SCORE, 	// 检测特征点的评价方法(例如使用Harris评价函数)
+		31, 					// 生成描述子时关键点周围邻域的尺寸
+		20 						// 计算 FAST 角点时像素值差值的阈值
 	);
 
 	//计算 ORB 关键点
@@ -295,33 +308,71 @@ int main() {
 
 	/* 特征点匹配 */
 	/*
+	cv::DMatch类
+	class DMatch{
+		int distance; 	// 两个特征点描述子之间的距离
+		int imgIdx; 	// 训练描述子来自的图像索引
+		int queryIdx; 	// 查询图像中的特征点索引
+		int trainIdx; 	// 训练图像中的特征点索引
+	};
+
+	特征点匹配函数
+	cv::DescriptorMatcher::match(	InputArray queryDescriptors, 	// 查询描述子集合
+									InputArray trainDescriptors, 	// 训练描述子集合
+									OutputArray matches, 			// 两个集合描述子匹配结果
+									InputArray mask = noArray() 	// 掩码图像
+									);								
+	
+	距离最近描述子匹配函数
+	cv::DesriptorMatcher::radiusMatch(	InputArray queryDescriptors, 				// 查询描述子集合
+										InputArray trainDescriptors, 				// 训练描述子集合
+										std::vector<std::vector<DMatch>>& matches, 	// 描述子匹配结果
+										float maxDistance, 							// 最大距离(满足条件的距离阈值,描述子距离应小于该值)
+										InputArray mask = noArray() 				// 掩码图像
+										bool compactResult = false 				 	// 输出匹配结果数目是否与查询描述子数目相同的选择标志
+										);											
+	
+	最近邻描述子匹配函数
+	cv::DescriptorMatcher::knnMatch(	InputArray queryDescriptors, 				// 查询描述子集合
+										InputArray trainDescriptors, 				// 训练描述子集合
+										std::vector<std::vector<DMatch>>& matches, 	// 描述子匹配结果
+										int k, 										// 每个查询描述子在训练描述子集合中的寻找的最优匹配结果的数目
+										InputArray mask = noArray() 				// 掩码图像
+										bool compactResult = false 					// 输出匹配结果数目是否与查询描述子数目相同的选择标志
+										);											
+
 	绘制特征点匹配结果
 	cv::drawMatches(	InputArray img1, 											// 输入图像1
 						const std::vector<KeyPoint>& keypoints1, 					// 输入特征点1
 						InputArray img2, 											// 输入图像2
 						const std::vector<KeyPoint>& keypoints2, 					// 输入特征点2
 						const std::vector<DMatch>& matches1to2, 					// 输入特征点匹配结果
-						OutputArray outImg, 										// 输出图像
-						const Scalar& matchColor = Scalar::all(-1), 				// 匹配线的颜色
-						const Scalar& singlePointColor = Scalar::all(-1), 			// 特征点的颜色
+						OutputArray outImg, 										// 显示匹配结果的输出图像
+						const Scalar& matchColor = Scalar::all(-1), 				// 连接线和关键点的颜色
+						const Scalar& singlePointColor = Scalar::all(-1), 			// 没有匹配点的关键点的颜色
 						const std::vector<char>& matchesMask = std::vector<char>(), // 匹配结果的掩码
 						int flags = DrawMatchesFlags::DEFAULT 						// 绘制特征点匹配结果的标志
 						);
 	
-	FLANN算法描述子匹配函数
-	cv::FlannBasedMatcher(	InputArray queryDescriptors, 	// 查询描述子
-							InputArray trainDescriptors, 	// 训练描述子
-							OutputArray matches, 			// 输出匹配结果
-							InputArray mask = noArray() 	// 掩码图像
-							);								// 返回值bool数据类型，表示是否匹配特征点描述子的结果，true表示有，false表示无
+	暴力匹配函数
+	cv::BFMatcher::BFMatcher(	int normType = NORM_L2, 	// 描述子距离计算方法的标志
+								bool crossCheck = false 	// 是否进行交叉验证的标志
+								);							
 	
+	FLANN算法描述子匹配函数
+	cv::FlannBasedMatcher::FlannBasedMatcher( 	const Ptr<flann::IndexParams> & indexParams = makePtr<flann::KDTreeIndexParams>(),	// 匹配时需要使用的搜索算法标志
+												const Ptr<flann::SearchParams> & searchParams = makePtr<flann::SearchParams>()		// 递归遍历的次数，遍历次数越多越精确，但需要的时间越长
+												);
+
 	计算单应性矩阵函数
-	cv::findHomography(	InputArray srcPoints, 				// 输入源图像的特征点
-						InputArray dstPoints, 				// 输入目标图像的特征点
-						int method, 						// 单应性矩阵计算方法的标志
-						double ransacReprojThreshold = 3, 	// RANSAC算法的阈值
+	cv::findHomography(	InputArray srcPoints, 				// 输入源图像的特征点的坐标
+						InputArray dstPoints, 				// 输入目标图像的特征点的坐标
+						int method, 						// 单应矩阵计算方法的标志
+						double ransacReprojThreshold = 3, 	// RANSAC算法,重投影的最大误差
 						OutputArray mask = noArray() 		// 输出掩码图像
-						);									// 返回值Mat数据类型，输出单应性矩阵
+						const int maxIters = 2000,			// RANSAC算法迭代的最大次数
+                        const double confidence = 0.995		// 置信区间,取值范围为0~1
+						);									// 返回值Mat数据类型，输出单应矩阵
 	*/
 
 	cv::Mat box, box_in_scene;  

@@ -69,9 +69,9 @@ int main(){
 										); 
 	棋盘格内角点检测
 	cv::findChessboardCorners(	InputArray image, 													// 输入图像
-								Size patternSize, 													// 棋盘格尺寸
-								OutputArray corners, 												// 输出角点
-								int flags = CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE 	// 标志位
+								Size patternSize, 													// 棋盘格尺寸(图像中棋盘内角点行数和列数)
+								OutputArray corners, 												// 输出角点的坐标
+								int flags = CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE 	// 检测到的内角点坐标
 								); 																	// 返回值bool数据类型，表示是否检测到角点的结果，true表示有，false表示无
 	
 	内角点位置优化
@@ -83,13 +83,25 @@ int main(){
 						); 							// 返回值bool数据类型，表示是否优化角点位置的结果，true表示有，false表示无
 	
 	圆形网格的圆心检测
-	cv::findCirclesGrid(	InputArray image, 														// 输入图像
+	cv::findCirclesGrid(InputArray image, 															// 输入图像
 						Size patternSize, 															// 圆形网格尺寸
 						OutputArray centers, 														// 输出圆心
 						int flags = CALIB_CB_SYMMETRIC_GRID, 										// 标志位
 						const cv::Ptr<FeatureDetector>& blobDetector = cv::Ptr<FeatureDetector>() 	// 特征检测器
 						); 																			// 返回值bool数据类型，表示是否检测到圆心的结果，true表示有，false表示无
 						
+	计算相机内参矩阵和畸变系数矩阵
+	cv::calibrateCamera(InputArrayOfArrays objectPoints,																// 棋盘格内角点的三位坐标
+                        InputArrayOfArrays imagePoints, 																// 棋盘格内角点在图像中的二维坐标
+						Size imageSize,																					// 图像的像素尺寸大小
+                        InputOutputArray cameraMatrix, 																	// 相机的内参矩阵
+						InputOutputArray distCoeffs,																	// 相机的畸变系数矩阵
+                        OutputArrayOfArrays rvecs, 																		// 相机坐标系与世界坐标系之间的旋转向量
+						OutputArrayOfArrays tvecs,																		// 相机坐标系与世界坐标系之间的平移向量
+                        int flags = 0, 																					// 选择标定算法的标志
+						TermCriteria criteria = TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 30, DBL_EPSILON) 	// 迭代终止条件
+						);																								// 返回值doubel数据类型,重投影误差
+
 	绘制棋盘格的内角点或者圆形网格的圆心
 	cv::drawChessboardCorners(	InputOutputArray image, 	// 输入输出图像
 								Size patternSize, 			// 棋盘格尺寸
@@ -97,13 +109,34 @@ int main(){
 								bool patternWasFound 		// 是否检测到角点或者圆心
 								); 							// 返回值bool数据类型，表示是否绘制角点或者圆心的结果，true表示有，false表示无
 	
+	计算校正图像需要的映射矩阵
+	cv::initUndistortRectifyMap(InputArray cameraMatrix, 	// 计算得到的相机内参矩阵
+								InputArray distCoeffs,		// 计算得到的相机畸变系数矩阵
+                             	InputArray R, 				// 第一幅、第二幅图像对应的相机位置之间的旋转矩阵
+								InputArray newCameraMatrix,	// 校正后的相机内参矩阵
+                             	Size size, 					// 图像尺寸
+								int m1type,					// 第一个输出映射矩阵变量的数据类型
+								OutputArray map1, 			// 输出x坐标校正映射矩阵
+								OutputArray map2 			// 输出y坐标校正映射矩阵
+								);
+	
+	根据映射矩阵对原始图像进行校正
+	cv::remap( 	InputArray src, 						// 含有畸变的原图像
+				OutputArray dst,						// 去畸变后的图像
+                InputArray map1,						// x坐标的校正映射矩阵
+				InputArray map2,						// y坐标的校正映射矩阵
+                int interpolation, 						// 插值类型标志
+				int borderMode = BORDER_CONSTANT,		// 像素外推方法标志
+                const Scalar& borderValue = Scalar()	// 用常值外推法时使用的常值像素
+				);
+	
 	图像去畸变校正
 	cv::undistort(	InputArray src, 						// 输入图像
 					OutputArray dst, 						// 输出图像
 					InputArray cameraMatrix, 				// 相机内参矩阵
 					InputArray distCoeffs, 					// 畸变系数
 					InputArray newCameraMatrix = noArray() 	// 新的相机内参矩阵
-					); 										// 返回值bool数据类型，表示是否去畸变校正的结果，true表示有，false表示无
+					); 										
 
 	单目相机空间点向图像投影
 	cv::projectPoints(	InputArray objectPoints, 			// 世界坐标系中的三维点
@@ -113,7 +146,7 @@ int main(){
 						InputArray distCoeffs, 				// 畸变系数
 						OutputArray imagePoints, 			// 输出图像坐标系中的二维点
 						OutputArray jacobian = noArray() 	// 输出雅克比矩阵
-						); 									// 返回值bool数据类型，表示是否投影的结果，true表示有，false表示无
+						); 									
 
 	计算位姿关系
 	cv::solvePnP(	InputArray objectPoints, 			// 世界坐标系中的三维点
@@ -129,7 +162,7 @@ int main(){
 	旋转向量与旋转矩阵相互转换
 	cv::Rodrigues(	InputArray src, 		// 输入旋转向量
 					OutputArray dst 		// 输出旋转矩阵
-					); 						// 返回值bool数据类型，表示是否转换的结果，true表示有，false表示无
+					); 						
 	*/
 	//设置两个三维坐标
 	std::vector<cv::Point3f> points3;
@@ -138,11 +171,11 @@ int main(){
 
 	//非齐次坐标转齐次坐标
 	cv::Mat points4;
-	convertPointsToHomogeneous(points3, points4);
+	cv::convertPointsToHomogeneous(points3, points4);
 
 	//齐次坐标转非齐次坐标
 	std::vector<cv::Point2f> points2;
-	convertPointsFromHomogeneous(points3, points2);
+	cv::convertPointsFromHomogeneous(points3, points2);
 
 	std::cout << "***********齐次坐标转非齐次坐标*************" << std::endl;
 	for (int i = 0; i < points3.size(); i++)
@@ -167,8 +200,8 @@ int main(){
 		return -1;
 	}
 	cv::Mat cheessgray, circlegray;
-	cvtColor(cheess, cheessgray, cv::COLOR_BGR2GRAY);
-	cvtColor(circle, circlegray, cv::COLOR_BGR2GRAY);
+	cv::cvtColor(cheess, cheessgray, cv::COLOR_BGR2GRAY);
+	cv::cvtColor(circle, circlegray, cv::COLOR_BGR2GRAY);
 
 	// 定义数目尺寸
 	cv::Size cheess_size = cv::Size(9, 6);   // 方格标定板内角点数目（行，列）
@@ -352,9 +385,9 @@ int main(){
 						InputArrayOfArrays imagePoints1, 	// 第一个相机的图像坐标系中的二维点
 						InputArrayOfArrays imagePoints2, 	// 第二个相机的图像坐标系中的二维点
 						InputOutputArray cameraMatrix1, 	// 第一个相机的内参矩阵
-						InputOutputArray distCoeffs1, 		// 第一个相机的畸变系数
+						InputOutputArray distCoeffs1, 		// 第一个相机的畸变系数矩阵
 						InputOutputArray cameraMatrix2, 	// 第二个相机的内参矩阵
-						InputOutputArray distCoeffs2, 		// 第二个相机的畸变系数
+						InputOutputArray distCoeffs2, 		// 第二个相机的畸变系数矩阵
 						Size imageSize, 					// 图像的尺寸
 						InputOutputArray R, 				// 旋转矩阵
 						InputOutputArray T, 				// 平移矩阵
@@ -362,13 +395,13 @@ int main(){
 						OutputArray F, 						// 基本矩阵
 						TermCriteria criteria, 				// 终止条件
 						int flags = CALIB_FIX_INTRINSIC 	// 标志位
-						);
+						);									// 返回值double数据类型,
 	
 	双目相机畸变校正					
 	cv::stereoRectify(	InputArray cameraMatrix1, 			// 第一个相机的内参矩阵
-						InputArray distCoeffs1, 			// 第一个相机的畸变系数
+						InputArray distCoeffs1, 			// 第一个相机的畸变系数矩阵
 						InputArray cameraMatrix2, 			// 第二个相机的内参矩阵
-						InputArray distCoeffs2, 			// 第二个相机的畸变系数
+						InputArray distCoeffs2, 			// 第二个相机的畸变系数矩阵
 						Size imageSize, 					// 图像的尺寸
 						InputArray R, 						// 旋转矩阵
 						InputArray T, 						// 平移矩阵
@@ -382,7 +415,7 @@ int main(){
 						Size newImageSize = Size(), 		// 新图像尺寸
 						Rect* validPixROI1 = 0, 			// 第一个相机的有效像素区域
 						Rect* validPixROI2 = 0 				// 第二个相机的有效像素区域
-						);q
+						);
 	*/
 	std::vector<cv::Mat> imgLs;
 	std::vector<cv::Mat> imgRs;

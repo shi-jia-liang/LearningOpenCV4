@@ -30,7 +30,7 @@ int main(){
 						int bottom, 						// 扩展下边界的像素行数
 						int left, 							// 扩展左边界的像素列数
 						int right,							// 扩展右边界的像素列数
-                        int borderType, 					// 扩展边界类型
+                        int borderType, 					// 扩展像素外推法选择标志
 						const Scalar& value = Scalar() 		// 扩展边界时使用的数值
 						);
 	
