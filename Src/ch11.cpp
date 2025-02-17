@@ -332,18 +332,6 @@ int main(){
 					);
 
 	LK稀疏光流法的目标跟踪函数
-	cv::calcOpticalFlowPyrLK(	prevImg, 	// 前一帧图像
-								nextImg, 	// 当前帧图像
-								prevPts, 	// 前一帧图像的特征点
-								nextPts, 	// 当前帧图像的特征点
-								status, 	// 特征点是否找到
-								err, 		// 特征点的误差
-								cv::Size(15, 15), 	// 搜索窗口大小
-								5, 		// 金字塔层数
-								cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 20, 0.03), 	// 停止条件
-								cv::OPTFLOW_USE_INITIAL_FLOW 	// 使用初始光流
-								);
-
 	cv::calcOpticalFlowPyrLK( 	InputArray prevImg, 																		// 前一帧图像
 								InputArray nextImg,																			// 当前帧图像
                                 InputArray prevPts, 																		// 前一帧图像的特征点
