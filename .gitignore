@@ -34,18 +34,10 @@
 # Debug files
 cmake-build-*/
 
-# idea configuation files
-.idea/
-
 # Resouces files
 executable/svm/images
 executable/svm/videos
 executable/calibration/data
 
-# vcpkg
-.vcpkg*
-
-# macOS
-.DS_Store
-
-/build/*
+# Build files
+build/*

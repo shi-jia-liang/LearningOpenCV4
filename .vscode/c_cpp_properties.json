@@ -1,0 +1,16 @@
+{
+    "version": 4,
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "D:/C_CPP/Library/OpenCV4/build/install/include/**",
+                "D:/C_CPP/Library/OpenCV4/build/install/include/opencv2/**"
+            ],
+            "compilerPath": "D:\\C_CPP\\msys64\\mingw64\\bin\\gcc.exe",
+            "intelliSenseMode": "windows-gcc-x64",
+            "defines": []
+        }
+    ]
+}
