@@ -10,6 +10,8 @@
             ],
             "compilerPath": "D:\\C_CPP\\msys64\\mingw64\\bin\\gcc.exe",
             "intelliSenseMode": "windows-gcc-x64",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
             "defines": []
         }
     ]
